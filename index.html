@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Levenshtein Distance</title>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;700&display=swap');
+
+* {
+	margin: 0;
+	padding: 0;
+    box-sizing: border-box;
+	font-family: 'Quicksand', sans-serif;
+}
+
+.animation {
+	text-align: center;
+}
+
+.selected {
+	background-color: #97cad8;
+}
+
+.controls {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 1.5rem 0;
+}
+
+.running {
+	margin: 1.5rem 0;
+}
+
+h1 {
+	margin: 0;
+	color: #018abe;
+    font-size: 2rem;
+}
+.h1 {
+    margin: 0;
+	color: #018abe;
+    font-size: 1.5rem;
+}
+
+.h2 {
+
+    margin: 0;
+    font-size: 1.3;
+}
+h2 {
+	margin: 1rem 0;
+	font-size: 1.2em;
+}
+
+.head {
+	margin: 2rem 0;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.behav {
+	margin-top: 2rem;
+}
+
+.matrix {
+	margin: 2rem 0;
+	margin-left: -20px;
+}
+.noMargin {
+	margin-left: 0;
+}
+
+.inputs {
+	display: flex;
+	justify-content: center;
+	margin: 1rem 0;
+}
+
+.player {
+	display: flex;
+	justify-content: space-around;
+}
+
+.in {
+	padding: .5em .5em;
+	padding-right: 1.5em;
+	width: 40%;
+	max-width: 200px;
+	margin: 0 .5rem;
+	border: 2px solid #f2f2f2;
+	border-radius: 3px;
+	outline: none;
+	transition: all .3s ease;
+}
+
+.in:focus {
+	border: 2px solid #018abe;
+}
+
+@media all and (max-width: 768px) {
+	.inputs {
+		margin: 1rem 0;
+		justify-content: space-around;
+	}
+
+	.player {
+		flex-direction: column-reverse;
+	}
+}
+
+.ceil {
+	width: 40px;
+	height: 40px;
+	text-align: center;
+	border: none;
+	border-radius: 0;
+	outline: 1px solid #000;
+	transition: all ease .3s;
+}
+
+.ceil:hover {
+	cursor: no-drop;
+}
+
+.pivot {
+	background-color: #018abe;
+	color: #fff;
+	font-weight: 700;
+}
+
+.trans {
+	outline: none;
+	font-weight: 700;
+}
+
+.double {
+	width: 40px;
+	height: 40px;
+	text-align: center;
+	border: none;
+	border-radius: 0;
+	transition: all ease .3s;
+	outline: none;
+	font-weight: 700;
+}
+
+.help {
+	width: 60px;
+	height: 60px;
+}
+
+.main {
+    width: 90%;
+    max-width: 960px;
+    margin: 3rem auto;
+    text-align: center;
+}
+
+section {
+    margin: 2rem 0;
+}
+
+.animation {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+button {
+    padding: .5rem .6rem;
+    color: #fff;
+    border: none;
+    background-color: #018abe;
+}
+
+button > a {
+    color: #fff;
+    text-decoration: none;
+}
+
+button:focus {
+    outline:2px solid #97cad8;
+}
+
+.player {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media all and (max-width: 600px) {
+    .player {
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+
+.problem {
+	text-align: left;
+}
+
+.title {
+	color: #018abe;
+	font-size: 1.3em;
+	font-weight: 700;
+	margin-bottom: .5rem;
+}
+
+.subtitle {
+	color: #018abe;
+	font-size: 1rem;
+	font-weight: 700;
+	margin-bottom: .5rem;
+}
+
+.p {
+	margin-bottom: .5rem;
+}
+
+.table {
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 70%;
+	border: 1px solid #000;
+	margin: 0 auto;
+	margin-bottom: 2rem;
+}
+
+.tableTitle {
+	font-size: .9em;
+}
+
+.border {
+	border: 1px solid #000;
+	padding: .1em .3em;
+	width: 50%;
+}
+
+.code {
+	font-family: 'Courier New', Courier, monospace;
+}
+
+.codes {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+}
+
+.image {
+    width: 48%;
+}
+
+img { width: 100%; }
+
+@media all and (max-width: 600px) {
+    .codes {
+        flex-direction: column;
+        align-items: center;
+    }
+    .image {
+        width: 100%;
+        margin: 1rem 0;
+    }
+}
+
+.big {
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, .6);
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.solutions {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.sol {
+    width: 48%;
+}
+
+@media all and (max-width: 600px) {
+    .solutions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .sol {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="./react.js"></script>
+    <script src="./dom.js"></script>
+    <script src="./babel.js"></script>
+<script type="text/babel">
+const Problem = () => {
+	return (
+		<div className="problem">
+			<p className="p">
+				The Levenshtein distance between two words is the minimum number of single-character edits (insertions,
+				deletions or substitutions) required to change one word into the other.
+			</p>
+			<p className="p">Given two words, return the Levenshtein Distance between them.</p>
+			<h3 className="subtitle">Example</h3>
+			<table className="table">
+				<thead>
+					<tr>
+						<th className="border">
+							<span className="tableTitle">Input</span>
+						</th>
+						<th className="border">
+							<span className="tableTitle">Output</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td className="border">
+							<span className="code">Ironman</span>
+							<br />
+							<span className="code">Spiderman</span>
+						</td>
+						<td className="border">
+							<span className="code">6</span>
+						</td>
+					</tr>
+					<tr>
+						<td className="border">
+							<span className="code">Hulk</span>
+							<br />
+							<span className="code">Thor</span>
+						</td>
+						<td className="border">
+							<span className="code">4</span>
+						</td>
+					</tr>
+					<tr>
+						<td className="border">
+							<span className="code">Thanos</span>
+							<br />
+							<span className="code">Thanos</span>
+						</td>
+						<td className="border">
+							<span className="code">0</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	);
+};
+const Animation = () => {
+    const [mat, setMat] = React.useState([])
+    const [a, setA] = React.useState('')
+    const [b, setB] = React.useState('')
+    const [velocity, setVelocity] = React.useState(1000)
+    const [start, setStart] = React.useState(false)
+    const [curr, setCurr] = React.useState([false, false, false])
+
+    const handleCurrent = (i = -1) => {
+        if(i < 0) {
+            setCurr([false, false, false])
+        } else {
+            let arr = [...curr]
+            arr[i] = true
+            setCurr([...arr])
+        }
+    }
+
+    const handleChange = (e, type = 'b') => {
+        const { target: { value }} = e
+        setMat([])
+
+        if(value.length > 16)
+            return;
+
+        type === 'a' ? setA(value) : setB(value)
+    }
+
+    const createMatrix = (e) => {
+        e.preventDefault()
+        if(a.length < 1 || b.length < 1)
+            return
+
+        let arr = []
+
+        for(let i = 0; i <= a.length; ++i) {
+            arr[i] = new Array(b.length + 1)
+            for(let j = 0; j <= b.length; ++j)
+                arr[i][j] = {
+                    value: i === 0 ? j : -1,
+                    pivot: false,
+                    selected: false
+                }
+            arr[i][0].value = i
+        }
+
+        setMat(arr)
+    }
+
+    const sleep = (ms = 1000) => {
+        return new Promise(accept => {
+            setTimeout(() => {
+                accept()
+            }, ms)
+        })
+    }
+
+    const min = (a = 0, b = 0, c = 0) => Math.min(a, Math.min(b, c))
+
+    const initAnimation = async () => {
+        setStart(true)
+        let m = [...mat]
+        let ii = 1, jj = 1
+        for(let i = 1; i < m.length; ++i)
+            for(let j = 1; j < m[0].length; ++j) {
+                m[ii-1][jj-1].selected = false
+                m[ii-1][jj].selected = false
+                m[ii][jj-1].selected = false
+                handleCurrent()
+                m[ii][jj].pivot = false
+                m[i][j].pivot = true
+                setMat([...m])
+                await sleep(3000 - velocity)
+                if (a[i - 1] === b[j - 1]) {
+					handleCurrent(0)
+					m[i - 1][j - 1].selected = true
+					setMat([ ...m ])
+					await sleep(3000 - velocity)
+					m[i][j].value = m[i - 1][j - 1].value
+				} else {
+					m[i - 1][j].selected = true
+					handleCurrent(1)
+					setMat([ ...m ])
+					await sleep(3000 - velocity)
+					handleCurrent(0)
+					m[i - 1][j - 1].selected = true
+					setMat([ ...m ])
+					await sleep(3000 - velocity)
+					handleCurrent(2)
+					m[i][j - 1].selected = true
+					setMat([ ...m ])
+					await sleep(3000 - velocity)
+					m[i][j].value = 1 + min(m[i - 1][j].value, m[i][j - 1].value, m[i - 1][j - 1].value)
+				}
+				ii = i
+				jj = j
+				setMat([ ...m ])
+				await sleep(3000 - velocity)
+            }
+
+        m[ii - 1][jj - 1].selected = false
+		m[ii - 1][jj].selected = false
+		m[ii][jj - 1].selected = false
+		handleCurrent()
+		setMat([ ...m ])
+		setStart(false)
+		setVelocity(1000)
+    }
+
+    const handleVelocity = (e) => {
+        const val = Number(e.target.value)
+        if(val > -1 && val < 3000)
+            setVelocity(val)
+    }
+
+    return (
+        <div className="animation">
+            <form onSubmit={createMatrix}>
+                <div className="inputs">
+                    <input type="text" className="in" placeholder="Word A" value={a} onChange={e => handleChange(e, 'a')} readOnly={start} />
+                    <input type="text" className="in" placeholder="Word B" value={b} onChange={e => handleChange(e, 'b')} readOnly={start} />
+                </div>
+                    {!mat.length && <a href="#anim"><button>Continue</button></a>}
+            </form>
+            <div className="player" id="anim">
+                <div className="behaviour">
+                    {!start && mat.length > 0 && (
+                        <div className="controls">
+                            <h3>Velocity (ms)</h3>
+                            <input type="number" value={velocity} onChange={handleVelocity} />
+                        </div>
+                    )}
+                    {mat.length > 0 && !start && <button onClick={initAnimation}>Start</button>}
+                    {mat.length > 0 && (
+						<div className="matrix no-margin">
+							<input
+								className={`ceil help ${curr[0] ? 'selected' : null}`}
+								readOnly
+								type="text"
+								value="replace"
+							/>
+							<input
+								className={`ceil help ${curr[1] ? 'selected' : null}`}
+								readOnly
+								type="text"
+								value="insert"
+							/>
+							<br />
+							<input
+								className={`ceil help ${curr[2] ? 'selected' : null}`}
+								readOnly
+								type="text"
+								value="delete"
+							/>
+							<input
+								className={`ceil help pivot`}
+								readOnly
+								type="text"
+								value="you here"
+							/>
+						</div>
+					)}
+                </div>
+                <div className="matrix">
+                    {mat.length > 0 && (
+                        <React.Fragment>
+                            <input type="text" className="double" value="" readOnly />
+                            <input type="text" className="double" value="" readOnly />
+                            {[...b].map((char, i) => <input key={`b${i}`} type="text" className="double" value={char} readOnly />)}
+                            < br/>
+                            {mat.map((arr, i) => (
+                                <React.Fragment key={`m${i}`}>
+                                    {i === 0 && <input type="text" className="double" value="" readOnly />}
+                                    {i > 0 && <input type="text" className="double" value={a[i - 1]} readOnly />}
+                                    {arr.map((el, j) =>
+                                        <input
+                                            key={`mat${i}_${j}`}
+                                            className={
+                                                el.pivot ? (
+                                                    `ceil pivot`
+                                                ) : el.selected ? (
+                                                    `ceil selected`
+                                                ) : `ceil`
+                                            }
+                                            value={el.value === -1 ? '' : el.value}
+                                            readOnly
+                                        />
+                                    )}
+                                    <br />
+                                </React.Fragment>
+                            ))}
+                        </React.Fragment>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const App = () => {
+  const [showSolution, setShowSolution] = React.useState(false);
+
+	return (
+        <main className="main">
+			<section>
+				<h1>Levenshtein Distance</h1>
+				<h2 className="h2">Dynamic Programming</h2>
+			</section>
+            <section>
+                <h1 className="h1">Problem Description</h1>
+                <Problem />
+                <button onClick={() => setShowSolution(!showSolution)}>Toggle solution</button>
+            </section>
+            {showSolution && (
+              <section>
+                  <h1 className="h1" >Solutions</h1>
+                  <div class="solutions">
+                      <div class="sol">
+                      <h3>Bottom Up (iterative)</h3>
+                      <p>Se establece el costo de una inserción, una eliminación y una sustitución en 1. Queremos calcular la distancia entre dos cadenas s y t con len (s) == m y len (t) == n .</p><br/><p> Se utiliza una matriz D, que contiene en la celda (i, j) la distancia de Levenshtein entre s [: i - 1] y t [: j - 1]. Los valores de la matriz se calcularán comenzando por la esquina superior izquierda y terminando en la esquina inferior derecha.
+  </p><br/><p>Se comienza llenando los casos base, es decir, la fila y la columna con el índice 0. </p><p>El cálculo en este caso significa que llenamos la fila con el índice 0 con las longitudes de las subcadenas de t y respectivamente llenamos la columna con el índice 0 con las longitudes de las subcadenas de s.</p>
+  <p>Los valores de todos los demás elementos de la matriz solo dependen de los valores de su vecino izquierdo, el vecino superior y el superior izquierdo.</p>
+  <br/><p>El cálculo de D (i, j) para i y j mayor que 0 funciona así: D (i, j) significa que estamos calculando la distancia de Levenshtein de las subcadenas s [0: i-1] y t [0 : j-1]. Si los últimos caracteres de estas subcadenas son iguales, la distancia de edición corresponde a la distancia de las subcadenas s [0: -1] y t [0: -1], que pueden estar vacías, si s o t consta de un solo carácter, lo que significa que usaremos los valores de la columna o fila 0. Si los últimos caracteres de s [0: i-1] y t [0: j-1] no son iguales, la distancia de edición D [i, j] se establecerá en la suma de 1 + min (D [i, j-1], D [i-1, j], D [i-1, j-1]). </p>
+                      </div>
+                      <div class="sol">
+                          <h3>Top Down (recursive)</h3>
+                      <p>{`Dos casos base:`}</p><br/>
+
+  <p>{`- Cuando i es igual a cero, o j es igual a cero, significa que se van a realizar tantas inserciones o supresiones como sean necesarias para convertir una cadena vacía en una cadena con caracteres o viceversa, respectivamente.`}</p><br/>
+
+  <p>{`- Si ya se resolvió el subproblema i, j, regresamos el resultado obtenido.`}</p><br/>
+
+  <p>{`- De otra manera, se evalúan tres operaciones:`}</p><br/>
+  	<p>{`- Reemplazar: Resolver el subproblema para i-1 y j-1, es decir, verificar si la transformación de la primera cadena requiere la sustitución del último caracter. Este caso aplica inmediatamente si los últimos caracteres son iguales.`}</p><br/>
+  	<p>{`- Insertar: Resolver el subproblema para i y j-1, es decir, ver si la transformación de la primera cadena requiere la inserción del caracter necesario.`}</p><br/>
+  	<p>{`- Suprimir: Resolver el subproblema para i-1 y j, es decir, ver si la transformación de la primera cadena requiere la eliminación de su último caracter.`}</p><br/>
+
+  <p>{`El menor de estos resultados es la respuesta al subproblema`}</p>
+                      </div>
+                  </div>
+                  <h2>Code</h2>
+                  <div class="codes">
+                      <div class="image">
+                          <h3>Bottom Up (iterative)</h3>
+                          <a href="./bottomUp.png"><img src="./bottomUp.png" alt="Code A" /></a>
+                          </div>
+                      <div class="image" >
+                          <h3>Top Down (recursive)</h3>
+                          <a href="./topDown.png"><img src="./topDown.png" alt="Code A" /></a>
+                      </div>
+                  </div>
+              </section>
+            )}
+            <section>
+                <h1>Animation</h1>
+                <Animation />
+            </section>
+		</main>
+	);
+};
+ReactDOM.render(<App />, document.getElementById('app'))
+const bottomUp = `
+int LevenshteinDistance(string& a, string& b) {
+    vector<vector<int>> dp(a.size() + 1, vector<int> (b.size() + 1, -1));
+    for(int i = 0; i <= a.size(); ++i)
+        dp[i][0] = i;
+    for(int j = 0; j <= a.size(); ++j)
+        dp[0][j] = j;
+    for(int i = 1; i <= a.size(); ++i)
+        for(int j = 1; j <= b.size(); ++j)
+            dp[i][j] = (a[i - 1] == b[j - 1]) ?
+                dp[i - 1][j - 1] :
+                1 + min(dp[i - 1][j], min(dp[i][j - 1], dp[i - 1][j - 1]));
+    return dp[a.size()][b.size()];
+}
+`
+
+const topDown = `
+vector<vector<int>> memo;
+int dp(string &a, string &b, int i, int j) {
+    if (i < 0 or j < 0)
+        return max(i, j) + 1;
+
+    if (memo[i][j] != -1)
+        return memo[i][j];
+
+    return memo[i][j] = (a[i] == b[j]) ?
+        dp(a, b, i - 1, j - 1) :
+        1 + min(dp(a, b, i - 1, j), min(dp(a, b, i, j - 1), dp(a, b, i - 1, j - 1)));
+}
+int LevenshteinDistance(string a, string b) {
+    memo.assign(a.size(), vector<int>(b.size(), -1));
+    return dp(a, b, a.size() - 1, b.size() - 1);
+}
+`
+    </script>
+</body>
+</html>
